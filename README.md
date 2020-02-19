@@ -1,2 +1,2 @@
-# izhikevich-model
-Interactive Izhikevich spiking neuron model
+# Izhikevich model
+_Interactive Izhikevich spiking neuron model_
