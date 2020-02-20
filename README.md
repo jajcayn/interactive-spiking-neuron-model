@@ -3,6 +3,7 @@ _Interactive Izhikevich spiking neuron model_
 
 ## Launch interactive binder
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jajcayn/izhikevich-model/master?filepath=izhikevich_model.ipynb)
+
 Nothing required, just click on the button, wait a bit till binder builds all that is necessary, and then click `Cell` -> `Run All`. The last cell contains the interactive plot.
 
 ## Homemade
