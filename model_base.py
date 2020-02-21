@@ -136,5 +136,25 @@ def get_ext_input(I_max, I_period, current_type, t_total, input_length):
         return ((I_max / I_period) * time) * (time < I_period) + I_max * (
             time > I_period
         )
+    elif current_type == "Ornstein-Uhlenbeck":
+        time = np.linspace(0, t_total, input_length)
+        return simulate_ornstein_uhlenbeck(
+            I_max, np.abs(I_max / 5.0), I_period, time
+        )
     else:
         raise ValueError("Unknown current type")
+
+
+def simulate_ornstein_uhlenbeck(mu, sigma, tau, time):
+    """
+    Simulate Ornstein-Uhlenbeck process.
+    """
+    dt = 0.1  # ms
+    x = np.zeros_like(time)
+    for i in range(x.shape[0] - 1):
+        x[i + 1] = (
+            x[i]
+            + dt * (-(x[i] - mu) / tau)
+            + sigma * np.sqrt(2.0 / tau) * np.sqrt(dt) * np.random.randn()
+        )
+    return x
