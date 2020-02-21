@@ -36,7 +36,7 @@ def setup_sliders_layout(model_specific_sliders):
         min=500, max=2000, step=5, value=750, description="time"
     )
     I_types = widgets.ToggleButtons(
-        options=["constant", "sq. pulse", "sine", "ramp"],
+        options=["constant", "sq. pulse", "sine", "ramp", "Ornstein-Uhlenbeck"],
         value="constant",
         description="Current type",
         disabled=False,
@@ -71,6 +71,9 @@ def setup_sliders_layout(model_specific_sliders):
         "T": T_slider,
         "current_type": I_types,
     }
+    for _, slider in sliders.items():
+        # lower number of "waiting" updates in the pipe
+        slider.msg_throttle = 1
     return grid, sliders
 
 
@@ -96,7 +99,7 @@ def integrate_and_plot(model_cls, **kwargs):
     spec = gridspec.GridSpec(ncols=3, nrows=3, figure=fig)
     # set up axis for timeseries of input current
     ax2 = fig.add_subplot(spec[2, :2])
-    ax2.set_ylim([-20, 20])
+    ax2.set_ylim([-20, 30])
     ax2.set_ylabel("INPUT CURRENT [AU]", size=LABEL_SIZE)
     ax2.set_xlabel("TIME [ms]", size=LABEL_SIZE)
     ax2.axvline(100.0, 0, 1, linestyle="--", color="grey", linewidth=0.7)
@@ -106,7 +109,7 @@ def integrate_and_plot(model_cls, **kwargs):
 
     # set up axis for timeseries of state vector
     ax1 = fig.add_subplot(spec[:2, :2], sharex=ax2)
-    ax1.set_ylim([-90, 20])
+    ax1.set_ylim([-90, 30])
     ax1.set_ylabel("MEMBRANE POTENTIAL [mV]", size=LABEL_SIZE)
     ax1.spines["right"].set_visible(False)
     ax1.spines["top"].set_visible(False)
@@ -128,7 +131,7 @@ def integrate_and_plot(model_cls, **kwargs):
     ax3.spines["top"].set_visible(False)
     ax3.set_xlabel("MEMBRANE RECOVERY", size=LABEL_SIZE)
     scatter_colors = colors[3]
-    ax3.set_ylim([-90, 20])
+    ax3.set_ylim([-90, 30])
     ax3.set_xlim([-20, 10])
     ax3.tick_params(axis="both", which="major", labelsize=LABEL_SIZE - 2)
 
