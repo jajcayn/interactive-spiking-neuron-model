@@ -58,3 +58,58 @@ class IzhikevichModel(BaseSpikingModel):
         v_deriv = 0.04 * np.power(v, 2) + 5.0 * v + 140.0 - u + I[t_idx]
         u_deriv = self.params["a"] * (self.params["b"] * v - u)
         return (v_deriv, u_deriv)
+
+
+class AdExIntegrateAndFire(BaseSpikingModel):
+    """
+    Adaptive exponential integrate-and-fire model.
+
+    Brette, R., & Gerstner, W. (2005). Adaptive exponential integrate-and-fire
+        model as an effective description of neuronal activity. Journal of
+        neurophysiology, 94(5), 3637-3642.
+    """
+
+    y0 = []
+    index_voltage_variable = 0
+    spike_condition = 30.0  # mV
+    required_params = [
+        "g_L",
+        "E_L",
+        "Delta_T",
+        "V_T",
+        "C",
+        "a",
+        "tau_w",
+        "v_r",
+        "b",
+    ]
+
+    def _apply_reset(self, y):
+        """
+        Spike reset for model:
+        v <- v_r
+        w <- w + b
+        """
+        y[0] = self.params["v_r"]
+        y[1] += self.params["b"]
+
+    def _rhs(self, t, y, I):
+        """
+        Right hand side of the equation:
+        v' = (-gL(V - EL) + gL*delta_T*exp(V - VT / delta_T) - w + I) / C
+        w' = (a(V - EL) - w) / tau_w
+        """
+        v, w = y
+        t_idx = int(t / self.dt)
+        v_deriv = (
+            -self.params["g_L"] * (v - self.params["E_L"])
+            + self.params["g_L"]
+            * self.params["Delta_T"]
+            * np.exp((v - self.params["V_T"]) / self.params["Delta_T"])
+            - w
+            + I[t_idx]
+        ) / self.params["C"]
+        w_deriv = (
+            self.params["a"] * (v - self.params["E_L"]) - w
+        ) / self.params["tau_w"]
+        return (v_deriv, w_deriv)
