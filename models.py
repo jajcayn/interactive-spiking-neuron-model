@@ -23,6 +23,36 @@ IZHIKEVICH_MODEL_SLIDERS = {
     ),
 }
 
+ADEX_MODEL_SLIDERS = {
+    "g_L": widgets.FloatSlider(
+        min=0.0, max=20.0, step=0.5, value=10.0, description="$g_{L}$"
+    ),
+    "E_L": widgets.FloatSlider(
+        min=-100.0, max=-20.0, step=5.0, value=-65.0, description="$E_{L}$"
+    ),
+    "Delta_T": widgets.FloatSlider(
+        min=0.0, max=10.0, step=0.1, value=1.5, description="$\Delta_{T}$"
+    ),
+    "V_T": widgets.FloatSlider(
+        min=-100.0, max=-20.0, step=5.0, value=-50.0, description="$V_{T}$"
+    ),
+    "C": widgets.IntSlider(
+        min=100, max=500, step=50, value=200, description="C"
+    ),
+    "a": widgets.FloatSlider(
+        min=0.0, max=30.0, step=0.5, value=15, description="a"
+    ),
+    "tau_w": widgets.FloatSlider(
+        min=50.0, max=500.0, step=50.0, value=200.0, description=r"$\tau_{w}$"
+    ),
+    "v_r": widgets.FloatSlider(
+        min=-100.0, max=-30.0, step=5.0, value=-40.0, description="$V_{r}$"
+    ),
+    "b": widgets.FloatSlider(
+        min=0.0, max=80.0, step=5.0, value=40.0, description="b"
+    ),
+}
+
 
 class IzhikevichModel(BaseSpikingModel):
     """
@@ -69,9 +99,9 @@ class AdExIntegrateAndFire(BaseSpikingModel):
         neurophysiology, 94(5), 3637-3642.
     """
 
-    y0 = []
+    y0 = [-70.0, 0.0]
     index_voltage_variable = 0
-    spike_condition = 30.0  # mV
+    spike_condition = -40.0  # mV
     required_params = [
         "g_L",
         "E_L",
