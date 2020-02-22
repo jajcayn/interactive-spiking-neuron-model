@@ -15,7 +15,7 @@ from model_base import get_ext_input
 prop_cycle = plt.rcParams["axes.prop_cycle"]
 colors = prop_cycle.by_key()["color"]
 plt.style.use("seaborn-muted")
-INPUT_START = 1000  # dt, i.e. 100ms
+INPUT_START = 100  # in ms
 LABEL_SIZE = 16
 
 
@@ -87,8 +87,8 @@ def integrate_and_plot(model_cls, **kwargs):
     current_type = kwargs.pop("current_type")
     model = model_cls(parameters=kwargs, T=T)
     ext_current = np.zeros((model.n_points + 1))
-    input_length = ext_current.shape[0] - INPUT_START
-    ext_current[INPUT_START:] = get_ext_input(
+    input_length = ext_current.shape[0] - int(INPUT_START / model.dt)
+    ext_current[int(INPUT_START / model.dt) :] = get_ext_input(
         I_max, I_period, current_type, model.T_total, input_length
     )
     model.set_input(ext_current)
@@ -109,7 +109,7 @@ def integrate_and_plot(model_cls, **kwargs):
 
     # set up axis for timeseries of state vector
     ax1 = fig.add_subplot(spec[:2, :2], sharex=ax2)
-    ax1.set_ylim([-90, 30])
+    ax1.set_ylim(model.plotting_bounds[model.index_voltage_variable])
     ax1.set_ylabel("MEMBRANE POTENTIAL [mV]", size=LABEL_SIZE)
     ax1.spines["right"].set_visible(False)
     ax1.spines["top"].set_visible(False)
@@ -131,13 +131,17 @@ def integrate_and_plot(model_cls, **kwargs):
     ax3.spines["top"].set_visible(False)
     ax3.set_xlabel("MEMBRANE RECOVERY", size=LABEL_SIZE)
     scatter_colors = colors[3]
-    ax3.set_ylim([-90, 30])
+    ax3.set_ylim(model.plotting_bounds[model.index_voltage_variable])
     ax3.set_xlim([-20, 10])
     ax3.tick_params(axis="both", which="major", labelsize=LABEL_SIZE - 2)
 
     # plot
-    ax1.plot(t, y[0, :], color=colors[0], linewidth=2.5)
+    ax1.plot(
+        t, y[model.index_voltage_variable, :], color=colors[0], linewidth=2.5
+    )
     ax12.plot(t, y[1:, :].T, color=colors[1])
     ax2.plot(t, model.ext_current[1:], color=colors[2])
-    ax3.scatter(y[1, :], y[0, :], s=7, c=scatter_colors)
+    ax3.scatter(
+        y[1, :], y[model.index_voltage_variable, :], s=7, c=scatter_colors
+    )
     plt.suptitle(f"Number of spikes: {model.num_spikes}", size=LABEL_SIZE + 3)

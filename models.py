@@ -10,7 +10,7 @@ from model_base import BaseSpikingModel
 
 IZHIKEVICH_MODEL_SLIDERS = {
     "a": widgets.FloatSlider(
-        min=0.02, max=0.1, step=0.008, value=0.02, description="a"
+        min=0.0, max=0.1, step=0.005, value=0.02, description="a"
     ),
     "b": widgets.FloatSlider(
         min=0.2, max=0.25, step=0.01, value=0.2, description="b"
@@ -40,16 +40,16 @@ ADEX_MODEL_SLIDERS = {
         min=100, max=500, step=50, value=200, description="C"
     ),
     "a": widgets.FloatSlider(
-        min=0.0, max=30.0, step=0.5, value=15, description="a"
+        min=0.0, max=30.0, step=0.5, value=4, description="a"
     ),
     "tau_w": widgets.FloatSlider(
         min=50.0, max=500.0, step=50.0, value=200.0, description=r"$\tau_{w}$"
     ),
     "v_r": widgets.FloatSlider(
-        min=-100.0, max=-30.0, step=5.0, value=-40.0, description="$V_{r}$"
+        min=-100.0, max=-20.0, step=5.0, value=-65.0, description="$V_{r}$"
     ),
     "b": widgets.FloatSlider(
-        min=0.0, max=80.0, step=5.0, value=40.0, description="b"
+        min=0.0, max=10.0, step=0.01, value=0.1, description="b"
     ),
 }
 
@@ -63,6 +63,7 @@ class IzhikevichModel(BaseSpikingModel):
     """
 
     y0 = [-70.0, -14.0]
+    plotting_bounds = [(-90, 30), (-20, 10)]
     index_voltage_variable = 0
     spike_condition = 30.0  # mV
     required_params = ["a", "b", "c", "d"]
@@ -99,9 +100,11 @@ class AdExIntegrateAndFire(BaseSpikingModel):
         neurophysiology, 94(5), 3637-3642.
     """
 
+    dt = 0.01
     y0 = [-70.0, 0.0]
     index_voltage_variable = 0
-    spike_condition = -40.0  # mV
+    plotting_bounds = [(-90, 30), (-20, 20)]
+    spike_condition = 20.0  # mV
     required_params = [
         "g_L",
         "E_L",
@@ -122,6 +125,7 @@ class AdExIntegrateAndFire(BaseSpikingModel):
         """
         y[0] = self.params["v_r"]
         y[1] += self.params["b"]
+        return y
 
     def _rhs(self, t, y, I):
         """

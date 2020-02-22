@@ -24,6 +24,7 @@ class BaseSpikingModel:
 
     dt = 0.1
     y0 = []
+    plotting_bounds = []
     index_voltage_variable = 0
     spike_condition = None
     required_params = []
@@ -39,6 +40,15 @@ class BaseSpikingModel:
         # input
         self.ext_current = None
         self.num_spikes = 0
+
+    @property
+    def indices_aux(self):
+        """
+        Return list of other indices, i.e. all except the voltage variable.
+        """
+        return [
+            i for i in range(len(self.y0)) if i != self.index_voltage_variable
+        ]
 
     def set_input(self, ext_current):
         """
@@ -115,6 +125,7 @@ class BaseSpikingModel:
         # stitch results together
         t = np.concatenate(ts)
         y = np.concatenate(ys, axis=1)
+        assert t.shape[0] == self.n_points, f"{t.shape[0]} vs. {self.n_points}"
         # return as time and y vector
         return t, y
 
